@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Skill Market</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" type="imagex/png" href="imagens/download-_1_.ico">
+</head>
+
+<body class="body2">
+    <header>
+    <div class="engrenagem-header">
+        <img src="imagens/engrenagem.png" alt="" class="imagem1-header">
+    </div>
+
+    <!-- Barra de busca embutida no cabeçalho -->
+    <div class="busca-header">
+        <input type="text" id="campoBuscaHeader" placeholder="Buscar profissionais...">
+        <button id="btnBuscarHeader">Buscar</button>
+    </div>
+
+    <div class="header-geral">
+        <ul class="itens-header">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sobrenos.html">Sobre Nós</a></li>
+            <li><a href="help.html">Help?</a></li>
+            <!-- IDs adicionados para controle dinâmico -->
+            <li id="menu-signin"><a href="signin.html">Sign In</a></li>
+            <li id="menu-signup"><a href="signup.html">Sign Up</a></li>
+        </ul>
+
+        <!-- ID adicionado para controle dinâmico do perfil -->
+        <div class="perfil-header" id="menu-perfil" style="display: none;">
+            <img src="imagens/julia.jpg" alt="" class="imagem2-header">
+            <div class="submenu-perfil">
+                <a href="perfil.html" id="linkMeuPerfilMenu">Meu Perfil</a>
+                    <a href="perfil-profissional.html">Editar Perfil</a>
+                    <a href="#" id="btnSair">Sair da Conta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <!-- Usando as mesmas classes do signup para reaproveitar o visual bonito -->
+    <main class="container-cadastro">
+        <form id="formLogin" class="cadastro">
+            <h1>Acesse sua conta</h1>
+
+            <input type="email" id="loginEmail" placeholder="Email..." required>
+            <input type="password" id="loginSenha" placeholder="Senha..." required>
+
+            <!-- Links auxiliares com estilo inline ajustado -->
+            <div style="display: flex; justify-content: space-between; margin: 0 10px;">
+                <a href="signup.html" style="color: #cfd6ff; text-decoration: none; font-size: 14px;">Não possuo conta</a>
+                <a href="esqueci-senha.html" style="color: #cfd6ff; text-decoration: none; font-size: 14px;">Esqueci minha senha</a>
+            </div>
+
+            <p id="mensagemErroLogin" class="mensagem-erro"></p>
+
+            <div class="botoes-cadastro">
+                <button type="submit" style="width: 100%;">Entrar!</button>
+            </div>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

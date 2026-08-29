@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Market</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" type="imagex/png" href="imagens/download-_1_.ico">
+</head>
+
+<body class="body2">
+   <header>
+    <div class="engrenagem-header">
+        <img src="imagens/engrenagem.png" alt="" class="imagem1-header">
+    </div>
+
+    <!-- Barra de busca embutida no cabeçalho -->
+    <div class="busca-header">
+        <input type="text" id="campoBuscaHeader" placeholder="Buscar profissionais...">
+        <button id="btnBuscarHeader">Buscar</button>
+    </div>
+
+    <div class="header-geral">
+        <ul class="itens-header">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sobrenos.html">Sobre Nós</a></li>
+            <li><a href="help.html">Help?</a></li>
+            <!-- IDs adicionados para controle dinâmico -->
+            <li id="menu-signin"><a href="signin.html">Sign In</a></li>
+            <li id="menu-signup"><a href="signup.html">Sign Up</a></li>
+        </ul>
+
+        <!-- ID adicionado para controle dinâmico do perfil -->
+        <div class="perfil-header" id="menu-perfil" style="display: none;">
+            <img src="imagens/julia.jpg" alt="" class="imagem2-header">
+            <div class="submenu-perfil">
+                <a href="perfil.html" id="linkMeuPerfilMenu">Meu Perfil</a>
+                    <a href="perfil-profissional.html">Editar Perfil</a>
+                    <a href="#" id="btnSair">Sair da Conta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+    <main class="container-perfilP">
+        <form id="formPerfil" class="card-cadastro card-perfil">
+            <h1>Editar Perfil</h1>
+            <!-- Insira este bloco dentro da tag <form id="formPerfil">, logo no início -->
+<div class="campo" style="text-align: center; align-items: center; margin-bottom: 20px;">
+    <label style="margin-bottom: 10px;">Foto de Perfil (Avatar)</label>
+    <label class="imagem-upload" style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; display: block; margin: 0 auto; cursor: pointer; border: 2px solid #ffb800;">
+        <img src="imagens/placeholder-usuario.png" alt="" class="preview-imagem" id="previewAvatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <input type="file" accept="image/*" id="inputAvatar" class="input-imagem" hidden>
+    </label>
+</div>
+            <div class="campo">
+                <label for="nomeCompleto">Nome completo</label>
+                <input type="text" id="nomeCompleto">
+            </div>
+
+            <div class="campo">
+                <label for="areaAtuacao">Área de atuação / Cargo</label>
+                <input type="text" id="areaAtuacao">
+            </div>
+
+            <div class="campo">
+                <label for="localizacao">Localização</label>
+                <input type="text" id="localizacao">
+            </div>
+
+            <div class="campo">
+                <label for="sobreVoce">Sobre você</label>
+                <textarea id="sobreVoce" rows="4"></textarea>
+            </div>
+
+            <div class="campo">
+                <label>Qualidades</label>
+                <div class="qualidades-container" id="qualidadesContainer">
+                    <input type="text" class="input-qualidade" placeholder="Qualidade">
+                    <input type="text" class="input-qualidade" placeholder="Qualidade">
+                    <input type="text" class="input-qualidade" placeholder="Qualidade">
+                    <button type="button" id="btnAddQualidade" class="btn-add-circular">+</button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="telefone">Telefone / Whatsapp</label>
+                <input type="text" id="telefone">
+            </div>
+
+            <div class="campo">
+                <label for="instagram">Instagram</label>
+                <input type="text" id="instagram">
+            </div>
+
+            <div class="campo">
+                <label for="emailContato">Email para contato</label>
+                <input type="email" id="emailContato">
+            </div>
+
+            <div class="campo">
+                <label for="site">Site pessoal / Portifólio</label>
+                <input type="text" id="site">
+            </div>
+
+            <div class="campo">
+                <label>Fotos</label>
+                <div class="imagens-container" id="imagensContainer">
+                    <label class="imagem-upload">
+                        <img src="imagens/placeholder-paisagem.png" alt="" class="preview-imagem">
+                        <input type="file" accept="image/*" class="input-imagem" hidden>
+                    </label>
+                    <label class="imagem-upload">
+                        <img src="imagens/placeholder-paisagem.png" alt="" class="preview-imagem">
+                        <input type="file" accept="image/*" class="input-imagem" hidden>
+                    </label>
+                    <button type="button" id="btnAddImagem" class="btn-add-circular btn-add-imagem">+</button>
+                </div>
+            </div>
+
+            <div class="botoes-perfilP">
+                <button type="submit" id="btnSalvarPerfil">Salvar perfil</button>
+            </div>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

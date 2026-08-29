@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Skill Market</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" type="imagex/png" href="imagens/download-_1_.ico">
+</head>
+<body class="body2">
+   <header>
+    <div class="engrenagem-header">
+        <img src="imagens/engrenagem.png" alt="" class="imagem1-header">
+    </div>
+
+    <!-- Barra de busca embutida no cabeçalho -->
+    <div class="busca-header">
+        <input type="text" id="campoBuscaHeader" placeholder="Buscar profissionais...">
+        <button id="btnBuscarHeader">Buscar</button>
+    </div>
+
+    <div class="header-geral">
+        <ul class="itens-header">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sobrenos.html">Sobre Nós</a></li>
+            <li><a href="help.html">Help?</a></li>
+            <!-- IDs adicionados para controle dinâmico -->
+            <li id="menu-signin"><a href="signin.html">Sign In</a></li>
+            <li id="menu-signup"><a href="signup.html">Sign Up</a></li>
+        </ul>
+
+        <!-- ID adicionado para controle dinâmico do perfil -->
+        <div class="perfil-header" id="menu-perfil" style="display: none;">
+            <img src="imagens/julia.jpg" alt="" class="imagem2-header">
+            <div class="submenu-perfil">
+                <a href="perfil.html" id="linkMeuPerfilMenu">Meu Perfil</a>
+                    <a href="perfil-profissional.html">Editar Perfil</a>
+                    <a href="#" id="btnSair">Sair da Conta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <main class="perfil-container-flex">
+        <!-- Coluna Esquerda: Card do Profissional (Imagem 2 e 3) -->
+        <section class="card-profissional-completo">
+            <img src="IMG" alt="" class="avatar-perfil-c" id="cAvatar">
+            <h2 id="cNome">Nome Profissional</h2>
+
+            <div class="capsulas-wrapper">
+                <div class="capsula" id="cLocalizacao">Toledo PR</div>
+                <div class="capsula" id="cEmpresa">Especialista</div>
+            </div>
+
+            <div class="bio-caixa" id="cBio">
+                Carregando descrição sobre o profissional...
+            </div>
+
+            <div class="tags-qualidades-c" id="cQualidades">
+                <!-- Tags inseridas via JS -->
+            </div>
+
+            <div class="contatos-icones">
+                <a href="#" id="cWhats" class="contato-item" target="_blank">✉ Gmail</a>
+                <a href="#" id="cWhatsReal" class="contato-item" target="_blank">💬 WhatsApp</a>
+                <a href="#" id="cInsta" class="contato-item" target="_blank">📸 Instagram</a>
+            </div>
+
+            <!-- Bloco de Avaliação (Imagem 3) -->
+            <div class="avaliacao-caixa">
+                <strong>Avalie este profissional</strong>
+                <div class="botoes-avaliacao">
+                    <button class="btn-aval" id="btnLike">👍 <span id="numLikes">0</span></button>
+                    <button class="btn-aval" id="btnDislike">👎 <span id="numDislikes">0</span></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coluna Direita: Grid do Portfólio 2x2 (Imagem 3) -->
+        <section class="portfolio-grid-c" id="cPortfolio">
+            <div class="portfolio-img-c"></div>
+            <div class="portfolio-img-c"></div>
+            <div class="portfolio-img-c"></div>
+            <div class="portfolio-img-c"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

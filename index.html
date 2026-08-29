@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Market</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" type="imagex/png" href="imagens/download-_1_.ico">
+</head>
+
+<body class="body2">
+      <header>
+    <div class="engrenagem-header">
+        <img src="imagens/engrenagem.png" alt="" class="imagem1-header">
+    </div>
+
+    <!-- Barra de busca embutida no cabeçalho -->
+    <div class="busca-header">
+        <input type="text" id="campoBuscaHeader" placeholder="Buscar profissionais...">
+        <button id="btnBuscarHeader">Buscar</button>
+    </div>
+
+    <div class="header-geral">
+        <ul class="itens-header">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sobrenos.html">Sobre Nós</a></li>
+            <li><a href="help.html">Help?</a></li>
+            <!-- IDs adicionados para controle dinâmico -->
+            <li id="menu-signin"><a href="signin.html">Sign In</a></li>
+            <li id="menu-signup"><a href="signup.html">Sign Up</a></li>
+        </ul>
+
+        <!-- ID adicionado para controle dinâmico do perfil -->
+        <div class="perfil-header" id="menu-perfil" style="display: none;">
+            <img src="imagens/julia.jpg" alt="" class="imagem2-header">
+            <div class="submenu-perfil">
+                <a href="perfil.html" id="linkMeuPerfilMenu">Meu Perfil</a>
+                    <a href="perfil-profissional.html">Editar Perfil</a>
+                    <a href="#" id="btnSair">Sair da Conta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <section class="logo">
+        <h1>
+            <img src="imagens/logoestrela.png" alt="" class="estrela-logo">
+            SKILL MARKET
+            <img src="imagens/logoburaco.png" alt="" class="logo-buraco">
+        </h1>
+        <p class="slogan">
+            Procure. Encontre. Conecte
+        </p>
+    </section>
+
+
+<!-- Essa div receberá os profissionais cadastrados no banco de dados -->
+<div class="container" id="containerProfissionais">
+    <!-- Os cards serão criados de forma dinâmica via JavaScript aqui dentro -->
+</div>
+    <div class="container">
+
+        <div class="card">
+            <div class="frontofcard">
+                <img src="/imagens/estrela.png" alt="">
+                <p>Clique e veja!</p>
+            </div>
+            <div class="backofcard">
+                <p>
+                Você é um profissional que oferece serviços digitais ou etá em busca de alguém capacitado para
+                impulsionar seu negócio?
+                O Skill Market nasceu para unir quem precisa com quem sabe fazer!
+                </p>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="frontofcard">
+                <img src="/imagens/estrela.png" alt="">
+                <p>Clique e veja!</p>
+            </div>
+            <div class="backofcard">
+                <p>
+                Os profissionais tomam a frente: o usuário cria seu perfil personalizado, destaca suas habilidades, área
+                de atuação, etc. Seja você social media, designer, editor ou programador, aqui é o lugar certo para se
+                apresentar ao mundo!
+                </p>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="frontofcard">
+                <img src="/imagens/estrela.png" alt="">
+                <p>Clique e veja!</p>
+            </div>
+            <div class="backofcard">
+                <p>
+                No SkillMarket, quem contrata é quem procura: empresas, empreendedores e pessoas físicas navegam por
+                categorias, filtram por habilidade e encontram exatamente o serviço que precisam — direto na fonte.
+                Procure. Encontre. Conecte.
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="frontofcard">
+                <img src="/imagens/estrela.png" alt="">
+                <p>Clique e veja!</p>
+            </div>
+            <div class="backofcard">
+                <p>
+                SkillMarket é mais do que uma vitrine de talentos: é uma ponte entre quem tem a solução e quem está
+                buscando por ela.
+                Entre, crie seu perfil e mostre do que você é capaz!
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
+    <section class="QuerUmTutorial">
+
+        <h1>
+            Quer um tutorial?
+        </h1>
+
+        <a href="help.html">Aprenda!</a>
+
+    </section>
+
+</body>
+     <script src="script.js"></script> 
+</html>
