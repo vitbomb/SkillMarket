@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Admin - Skill Market</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="body2">
+    <!-- TELA DE LOGIN DO ADMIN -->
+    <main class="container-cadastro" id="secaoLoginAdmin">
+        <form id="formAdmin" class="cadastro">
+            <h1 style="color: #ffb800;">Acesso Restrito</h1>
+            <p style="color: white; text-align: center; margin-bottom: 15px;">Área exclusiva para moderação do Skill Market.</p>
+            <input type="email" id="adminEmail" placeholder="E-mail Administrativo..." required>
+            <input type="password" id="adminSenha" placeholder="Senha..." required>
+            <p id="msgErroAdmin" class="mensagem-erro"></p>
+            <div class="botoes-cadastro">
+                <button type="submit" style="width: 100%; background-color: #ffb800; color: #091c72;">Entrar no Painel</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- PAINEL DE MODERAÇÃO (Inicia oculto) -->
+    <main class="perfil-container-flex" id="secaoPainelAdmin" style="display: none; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background-color: #2436a8; padding: 20px; border-radius: 20px; color: white;">
+            <h2>Painel de Moderação</h2>
+            <button id="btnSairAdmin" style="background-color: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Sair</button>
+        </div>
+
+        <h3 style="color: white; margin-top: 20px;">Perfis aguardando aprovação:</h3>
+        <div class="resultados-grid" id="containerPendentes" style="margin-top: 10px;">
+            <!-- Perfis renderizados pelo JS -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

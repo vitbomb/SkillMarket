@@ -24,14 +24,65 @@ const transportador = nodemailer.createTransport({
     }
 });
 
-// Rota de Teste
+// ==========================================
+// ROTAS DE ADMINISTRAÇÃO (MODERAÇÃO)
+// ==========================================
+
+// Login do Administrador
+// Login do Administrador
+app.post('/api/admin/login', (req, res) => {
+    const { email, senha } = req.body;
+    
+    // --- ESPIONANDO AS VARIÁVEIS NO TERMINAL ---
+    console.log("=== TENTATIVA DE LOGIN ADMIN ===");
+    console.log(`O que você digitou na tela -> Email: '${email}' | Senha: '${senha}'`);
+    console.log(`O que o servidor leu no .env -> Email: '${process.env.ADMIN_EMAIL}' | Senha: '${process.env.ADMIN_SENHA}'`);
+    // -------------------------------------------
+
+    if (email === process.env.ADMIN_EMAIL && senha === process.env.ADMIN_SENHA) {
+        const tokenAdmin = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '12h' });
+        return res.json({ mensagem: 'Login de Admin efetuado!', tokenAdmin });
+    }
+    return res.status(401).json({ erro: 'Credenciais de administrador inválidas.' });
+});
+
+// Listar perfis pendentes
+app.get('/api/admin/pendentes', async (req, res) => {
+    try {
+        const resultado = await pool.query(`
+            SELECT p.*, u.nome, u.email 
+            FROM perfis p 
+            JOIN usuarios u ON p.usuario_id = u.id 
+            WHERE p.status = 'pendente'
+        `);
+        res.json(resultado.rows);
+    } catch (erro) {
+        res.status(500).json({ erro: 'Erro ao buscar perfis pendentes.' });
+    }
+});
+
+// Aprovar ou Rejeitar perfil
+app.patch('/api/admin/avaliar/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; // Deve receber 'aprovado' ou 'rejeitado'
+    try {
+        await pool.query('UPDATE perfis SET status = $1 WHERE id = $2', [status, id]);
+        res.json({ mensagem: `Perfil marcado como ${status}.` });
+    } catch (erro) {
+        res.status(500).json({ erro: 'Erro ao atualizar status do perfil.' });
+    }
+});
+
+// ==========================================
+// ROTAS PÚBLICAS E DE USUÁRIOS
+// ==========================================
+
 app.get('/api/teste', (req, res) => {
     res.json({ status: "Servidor está online!" });
 });
 
 // 1. CADASTRO (SIGN UP)
 app.post('/api/signup', async (req, res) => {
-    console.log("=== NOVA REQUISIÇÃO DE CADASTRO ===");
     const { nome, email, senha } = req.body;
 
     if (!nome || !email || !senha) {
@@ -60,7 +111,6 @@ app.post('/api/signup', async (req, res) => {
         };
 
         await transportador.sendMail(opcoesEmail);
-        console.log(`✓ Código de verificação enviado para ${email}`);
 
         res.status(201).json({
             mensagem: 'Código enviado!',
@@ -69,7 +119,6 @@ app.post('/api/signup', async (req, res) => {
         });
 
     } catch (erro) {
-        console.error("Erro no cadastro:", erro);
         res.status(500).json({ erro: 'Erro interno ao processar cadastro no servidor.' });
     }
 });
@@ -95,14 +144,12 @@ app.post('/api/verificar-codigo', async (req, res) => {
 
         res.json({ mensagem: 'E-mail validado com sucesso!' });
     } catch (erro) {
-        console.error(erro);
         res.status(500).json({ erro: 'Erro ao processar validação.' });
     }
 });
 
 // 3. LOGIN (SIGN IN)
 app.post('/api/signin', async (req, res) => {
-    console.log("=== NOVA REQUISIÇÃO DE LOGIN ===");
     const { email, senha } = req.body;
 
     if (!email || !senha) {
@@ -127,7 +174,6 @@ app.post('/api/signin', async (req, res) => {
         }
 
         const token = jwt.sign({ id: usuario.id, email: usuario.email }, JWT_SECRET, { expiresIn: '4h' });
-        console.log("✓ Login efetuado para:", email);
 
         return res.json({
             mensagem: 'Login efetuado com sucesso!',
@@ -135,7 +181,6 @@ app.post('/api/signin', async (req, res) => {
             usuarioId: usuario.id
         });
     } catch (erro) {
-        console.error("Erro no login:", erro.message);
         res.status(500).json({ erro: 'Erro interno de processamento.' });
     }
 });
@@ -166,7 +211,6 @@ app.post('/api/esqueci-senha', async (req, res) => {
         res.json({ mensagem: 'Link enviado!' });
 
     } catch (erro) {
-        console.error(erro);
         res.status(500).json({ erro: 'Erro ao processar recuperação de senha.' });
     }
 });
@@ -190,7 +234,6 @@ app.post('/api/redefinir-senha', async (req, res) => {
 
         res.json({ mensagem: 'Senha alterada!' });
     } catch (erro) {
-        console.error(erro);
         res.status(500).json({ erro: 'Erro ao atualizar senha.' });
     }
 });
@@ -200,39 +243,24 @@ app.post('/api/intencao', async (req, res) => {
     const { usuario_id, intencao } = req.body;
 
     try {
-        await pool.query(
-            'UPDATE usuarios SET intencao = $1 WHERE id = $2',
-            [intencao, usuario_id]
-        );
+        await pool.query('UPDATE usuarios SET intencao = $1 WHERE id = $2', [intencao, usuario_id]);
         res.status(200).json({ mensagem: 'Intenção registrada!' });
     } catch (erro) {
-        console.error(erro);
         res.status(500).json({ erro: 'Erro ao salvar intenção.' });
     }
 });
 
-// 7. SALVAR PERFIL DO PROFISSIONAL
+// 7. SALVAR PERFIL DO PROFISSIONAL (Vai para "pendente")
 app.post('/api/perfil', async (req, res) => {
     const {
-        usuario_id,
-        nome_completo,
-        area_atuacao,
-        localizacao,
-        sobre_voce,
-        qualidades,
-        telefone,
-        instagram,
-        email_contato,
-        site,
-        fotos,
-        foto_perfil
+        usuario_id, nome_completo, area_atuacao, localizacao, sobre_voce, qualidades, telefone, instagram, email_contato, site, fotos, foto_perfil
     } = req.body;
 
     try {
         const queryUpsert = `
             INSERT INTO perfis (
-                usuario_id, nome_completo, area_atuacao, localizacao, sobre_voce, qualidades, telefone, instagram, email_contato, site, fotos, foto_perfil
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                usuario_id, nome_completo, area_atuacao, localizacao, sobre_voce, qualidades, telefone, instagram, email_contato, site, fotos, foto_perfil, status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pendente')
             ON CONFLICT (usuario_id) 
             DO UPDATE SET 
                 nome_completo = EXCLUDED.nome_completo,
@@ -245,29 +273,15 @@ app.post('/api/perfil', async (req, res) => {
                 email_contato = EXCLUDED.email_contato,
                 site = EXCLUDED.site,
                 fotos = EXCLUDED.fotos,
-                foto_perfil = EXCLUDED.foto_perfil
+                foto_perfil = EXCLUDED.foto_perfil,
+                status = 'pendente' -- Sempre volta para pendente após edição para ser aprovado novamente
             RETURNING id;
         `;
 
-        const valores = [
-            usuario_id,
-            nome_completo || null,
-            area_atuacao || null,
-            localizacao || null,
-            sobre_voce || null,
-            qualidades || null,
-            telefone || null,
-            instagram || null,
-            email_contato || null,
-            site || null,
-            fotos || null,
-            foto_perfil || null
-        ];
-
+        const valores = [usuario_id, nome_completo, area_atuacao, localizacao, sobre_voce, qualidades, telefone, instagram, email_contato, site, fotos, foto_perfil];
         const resultado = await pool.query(queryUpsert, valores);
-        res.status(200).json({ mensagem: 'Perfil salvo!', perfilId: resultado.rows[0].id });
+        res.status(200).json({ mensagem: 'Perfil salvo e enviado para análise do Administrador!', perfilId: resultado.rows[0].id });
     } catch (erro) {
-        console.error(erro);
         res.status(500).json({ erro: 'Erro ao salvar perfil.' });
     }
 });
@@ -287,7 +301,7 @@ app.post('/api/perfil/:usuario_id/avaliar', async (req, res) => {
     }
 });
 
-// 9. BUSCAR TODOS OS PERFIS
+// 9. BUSCAR TODOS OS PERFIS (Só mostra os aprovados)
 app.get('/api/perfis', async (req, res) => {
     const { busca } = req.query;
 
@@ -296,11 +310,12 @@ app.get('/api/perfis', async (req, res) => {
             SELECT p.*, u.nome, u.email 
             FROM perfis p 
             JOIN usuarios u ON p.usuario_id = u.id
+            WHERE p.status = 'aprovado'
         `;
         let valores = [];
 
         if (busca) {
-            query += ` WHERE p.nome_completo ILIKE $1 OR p.area_atuacao ILIKE $1 OR p.qualidades ILIKE $1 OR p.localizacao ILIKE $1`;
+            query += ` AND (p.nome_completo ILIKE $1 OR p.area_atuacao ILIKE $1 OR p.qualidades ILIKE $1 OR p.localizacao ILIKE $1)`;
             valores.push(`%${busca}%`);
         }
 

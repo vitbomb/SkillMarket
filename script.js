@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     preencherFormularioPerfil();
 });
 
-
 // --- SAIR DA CONTA ---
 const btnSair = document.getElementById('btnSair');
 if (btnSair) {
@@ -56,7 +55,6 @@ if (btnSair) {
         window.location.href = 'index.html';
     });
 }
-
 
 // --- PROCESSAMENTO DO LOGIN (SIGN IN) ---
 const formLogin = document.getElementById('formLogin');
@@ -87,13 +85,11 @@ if (formLogin) {
             localStorage.setItem('usuarioId', dados.usuarioId);
 
             window.location.href = `perfil.html?id=${dados.usuarioId}`;
-
         } catch (erro) {
             if (mensagemErroLogin) mensagemErroLogin.textContent = 'Erro ao conectar ao servidor.';
         }
     });
 }
-
 
 // --- BUSCA NO CABEÇALHO ---
 const campoBuscaHeader = document.getElementById('campoBuscaHeader');
@@ -112,12 +108,14 @@ if (btnBuscarHeader && campoBuscaHeader) {
     });
 }
 
-
 // --- RENDERIZAR RESULTADOS DA BUSCA (BUSCA.HTML) ---
 const containerResultados = document.getElementById('containerResultados');
+const containerProfissionais = document.getElementById('containerProfissionais'); // Para index.html
 
 async function carregarResultadosBusca() {
-    if (!containerResultados) return;
+    // Detecta onde deve renderizar (na index ou na busca)
+    const renderTarget = containerResultados || containerProfissionais;
+    if (!renderTarget) return;
 
     const parametros = new URLSearchParams(window.location.search);
     const termoBusca = parametros.get('busca') || '';
@@ -129,27 +127,46 @@ async function carregarResultadosBusca() {
         const resposta = await fetch(url);
         const profissionais = await resposta.json();
 
-        containerResultados.innerHTML = '';
+        renderTarget.innerHTML = '';
 
         if (profissionais.length === 0) {
-            containerResultados.innerHTML = '<p style="color: white; font-size: 18px; width: 100%; text-align: center;">Nenhum profissional localizado.</p>';
+            renderTarget.innerHTML = '<p style="color: white; font-size: 18px; width: 100%; text-align: center;">Nenhum profissional aprovado localizado.</p>';
             return;
         }
 
         profissionais.forEach(prof => {
             const card = document.createElement('div');
-            card.className = 'card-resultado';
+            // Diferencia o CSS se for Index ou Tela de Busca
+            card.className = containerResultados ? 'card-resultado' : 'card';
+            
             const fotoExibicao = prof.foto_perfil || 'imagens/placeholder-usuario.png';
 
-            card.innerHTML = `
-                <img src="${fotoExibicao}" class="avatar-card-resultado">
-                <h2>${prof.nome_completo || prof.nome}</h2>
-                <div class="card-resultado-info">
-                    <p>${prof.sobre_voce ? prof.sobre_voce.substring(0, 110) + '...' : 'Sem descrição no momento.'}</p>
-                </div>
-                <a href="perfil.html?id=${prof.usuario_id}" class="btn-resultado">Acessar Perfil</a>
-            `;
-            containerResultados.appendChild(card);
+            if (containerResultados) {
+                card.innerHTML = `
+                    <img src="${fotoExibicao}" class="avatar-card-resultado">
+                    <h2>${prof.nome_completo || prof.nome}</h2>
+                    <div class="card-resultado-info">
+                        <p>${prof.sobre_voce ? prof.sobre_voce.substring(0, 110) + '...' : 'Sem descrição no momento.'}</p>
+                    </div>
+                    <a href="perfil.html?id=${prof.usuario_id}" class="btn-resultado">Acessar Perfil</a>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="frontofcard">
+                        <div>
+                            <strong style="font-size: 20px;">${prof.nome_completo || prof.nome}</strong>
+                            <p style="margin-top: 10px; font-size: 14px; opacity: 0.9;">${prof.area_atuacao || 'Profissional'}</p>
+                        </div>
+                    </div>
+                    <div class="backofcard" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px;">
+                        <p style="font-size: 13px; margin-bottom: 15px; line-height: 1.4;">
+                            ${prof.sobre_voce ? prof.sobre_voce.substring(0, 100) + '...' : 'Sem descrição disponível.'}
+                        </p>
+                        <a href="perfil.html?id=${prof.usuario_id}" style="background-color: #5170ff; color: white; text-decoration: none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: bold;">Acessar Perfil</a>
+                    </div>
+                `;
+            }
+            renderTarget.appendChild(card);
         });
 
     } catch (erro) {
@@ -157,10 +174,9 @@ async function carregarResultadosBusca() {
     }
 }
 
-if (containerResultados) {
+if (containerResultados || containerProfissionais) {
     carregarResultadosBusca();
 }
-
 
 // --- EXIBIÇÃO DO PERFIL DINÂMICO COMPLETO (PERFIL.HTML) ---
 const cNome = document.getElementById('cNome');
@@ -182,8 +198,12 @@ if (cNome) {
         try {
             const resposta = await fetch(`${API_URL}/perfil/${usuarioId}`);
             
+            // VERIFICA SE QUEM ESTÁ ACESSANDO TEM TOKEN DE ADMIN
+            const isAdmin = localStorage.getItem('tokenAdmin') !== null;
+            const isDonoDoPerfil = usuarioId === localStorage.getItem('usuarioId');
+            
             if (!resposta.ok) {
-                if (usuarioId === localStorage.getItem('usuarioId')) {
+                if (isDonoDoPerfil) {
                     alert('Você ainda não configurou seu perfil profissional. Vamos preencher seus dados agora!');
                     window.location.href = 'perfil-profissional.html';
                 } else {
@@ -194,6 +214,18 @@ if (cNome) {
             }
 
             const prof = await resposta.json();
+
+            // LÓGICA DE BLOQUEIO ATUALIZADA (Permite o Admin acessar)
+            if (prof.status === 'pendente' && isDonoDoPerfil) {
+                alert("Atenção: Seu perfil está em análise pelos administradores. Ele só aparecerá nas buscas após ser aprovado.");
+            } else if (prof.status === 'rejeitado' && isDonoDoPerfil) {
+                alert("Atenção: Seu perfil foi REJEITADO. Por favor, edite suas informações para uma nova análise.");
+            } else if (prof.status !== 'aprovado' && !isDonoDoPerfil && !isAdmin) {
+                // Se não for aprovado, não for o dono E NÃO FOR ADMIN, bloqueia!
+                alert("Este perfil não está disponível para visualização pública no momento.");
+                window.location.href = 'index.html';
+                return;
+            }
 
             cNome.textContent = prof.nome_completo || prof.nome;
             document.getElementById('cLocalizacao').textContent = prof.localizacao || 'Sem localização';
@@ -281,8 +313,6 @@ if (cNome) {
 
     carregarPerfilCompleto();
 }
-
-
 // --- FORMULÁRIO DE EDICÃO DE PERFIL ---
 async function preencherFormularioPerfil() {
     const formPerfil = document.getElementById('formPerfil');
@@ -311,7 +341,6 @@ async function preencherFormularioPerfil() {
             if (previewAvatar) previewAvatar.src = prof.foto_perfil;
         }
 
-        // RECONSTRUÇÃO DAS QUALIDADES DINÂMICAS SALVAS
         const qualidadesContainer = document.getElementById('qualidadesContainer');
         const btnAddQualidade = document.getElementById('btnAddQualidade');
         if (qualidadesContainer && btnAddQualidade && prof.qualidades) {
@@ -329,7 +358,6 @@ async function preencherFormularioPerfil() {
             });
         }
 
-        // RECONSTRUÇÃO DAS FOTOS DO PORTFÓLIO SALVAS
         const imagensContainer = document.getElementById('imagensContainer');
         const btnAddImagem = document.getElementById('btnAddImagem');
         if (imagensContainer && btnAddImagem && prof.fotos) {
@@ -369,7 +397,6 @@ async function preencherFormularioPerfil() {
         console.error(erro);
     }
 }
-
 
 // --- FORMULÁRIO DE CADASTRO (SIGN UP) ---
 const formCadastro = document.getElementById('formCadastro');
@@ -425,7 +452,6 @@ if (formCadastro) {
     });
 }
 
-
 // --- INTENÇÃO ---
 const opcaoContratar = document.getElementById('opcaoContratar');
 const opcaoAmbos = document.getElementById('opcaoAmbos');
@@ -469,7 +495,6 @@ if (opcaoAmbos) {
         registrarIntencao('Contratar e oferecer', 'perfil-profissional.html');
     });
 }
-
 
 // --- GESTÃO DE IMAGENS E PREVIEW DO PORTFÓLIO ---
 function ativarPreview(inputImagem) {
@@ -515,9 +540,8 @@ if (btnAddImagem && imagensContainer) {
     });
 }
 
-
 // --- FORMULÁRIO SALVAR PERFIL COMPLETO ---
-const formPerfil = document.getElementById('formPerfil'); // ADICIONADO: Declarado globalmente corrigindo o ReferenceError
+const formPerfil = document.getElementById('formPerfil');
 
 if (formPerfil) {
     formPerfil.addEventListener('submit', async function (evento) {
@@ -590,7 +614,7 @@ if (formPerfil) {
                 return;
             }
 
-            alert('Perfil e portfólio atualizados com sucesso!');
+            alert('Perfil enviado para moderação! Assim que aprovado pelo Administrador, ele ficará público.');
             window.location.href = `perfil.html?id=${usuarioId}`;
 
         } catch (erro) {
@@ -599,7 +623,6 @@ if (formPerfil) {
         }
     });
 }
-
 
 // --- ADICIONAR CAMPOS DE QUALIDADES ---
 const btnAddQualidade = document.getElementById('btnAddQualidade');
@@ -616,7 +639,6 @@ if (btnAddQualidade && qualidadesContainer) {
         novoInput.focus();
     });
 }
-
 
 // --- VERIFICAÇÃO DE E-MAIL (OTP) ---
 const formVerificar = document.getElementById('formVerificar');
@@ -658,7 +680,6 @@ if (formVerificar) {
     });
 }
 
-
 // --- RECUPERAÇÃO DE SENHA (ESQUECI A SENHA) ---
 const formEsqueci = document.getElementById('formEsqueci');
 const msgErroEsqueci = document.getElementById('mensagemErroEsqueci');
@@ -690,7 +711,6 @@ if (formEsqueci) {
         }
     });
 }
-
 
 // --- REDEFINIÇÃO DE SENHA ---
 const formRedefinir = document.getElementById('formRedefinir');
@@ -737,4 +757,117 @@ if (formRedefinir) {
             msgErroRedefinir.textContent = 'Erro ao processar redefinição.';
         }
     });
+}
+
+// ==========================================
+// PAINEL ADMINISTRATIVO (ADMIN.HTML)
+// ==========================================
+const formAdmin = document.getElementById('formAdmin');
+const secaoLoginAdmin = document.getElementById('secaoLoginAdmin');
+const secaoPainelAdmin = document.getElementById('secaoPainelAdmin');
+const containerPendentes = document.getElementById('containerPendentes');
+
+if (formAdmin) {
+    if (localStorage.getItem('tokenAdmin')) {
+        abrirPainelAdmin();
+    }
+
+    formAdmin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('adminEmail').value;
+        const senha = document.getElementById('adminSenha').value;
+
+        try {
+            const resposta = await fetch(`${API_URL}/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                document.getElementById('msgErroAdmin').textContent = dados.erro;
+                return;
+            }
+
+            localStorage.setItem('tokenAdmin', dados.tokenAdmin);
+            abrirPainelAdmin();
+        } catch (erro) {
+            document.getElementById('msgErroAdmin').textContent = 'Erro ao conectar.';
+        }
+    });
+}
+
+function abrirPainelAdmin() {
+    secaoLoginAdmin.style.display = 'none';
+    secaoPainelAdmin.style.display = 'flex';
+    carregarPerfisPendentes();
+}
+
+const btnSairAdmin = document.getElementById('btnSairAdmin');
+if (btnSairAdmin) {
+    btnSairAdmin.addEventListener('click', () => {
+        localStorage.removeItem('tokenAdmin');
+        window.location.reload();
+    });
+}
+
+async function carregarPerfisPendentes() {
+    try {
+        const resposta = await fetch(`${API_URL}/admin/pendentes`);
+        const pendentes = await resposta.json();
+        
+        containerPendentes.innerHTML = '';
+        if (pendentes.length === 0) {
+            containerPendentes.innerHTML = '<p style="color: white; width:100%; text-align:center;">Nenhum perfil pendente de aprovação.</p>';
+            return;
+        }
+
+        pendentes.forEach(prof => {
+            const card = document.createElement('div');
+            card.className = 'card-resultado';
+            const fotoExibicao = prof.foto_perfil || 'imagens/placeholder-usuario.png';
+
+            card.innerHTML = `
+                <img src="${fotoExibicao}" class="avatar-card-resultado">
+                <h2>${prof.nome_completo || prof.nome}</h2>
+                <div class="card-resultado-info" style="margin-bottom: 10px;">
+                    <p><strong>Área:</strong> ${prof.area_atuacao}</p>
+                    <p style="margin-top:5px; font-size:12px;">${prof.sobre_voce ? prof.sobre_voce.substring(0, 80) + '...' : ''}</p>
+                </div>
+                
+                <!-- NOVO BOTÃO QUE ABRE O PERFIL EM UMA NOVA ABA -->
+                <a href="perfil.html?id=${prof.usuario_id}" target="_blank" style="background-color: #3b82f6; color: white; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: bold; margin-bottom: 15px; width: 100%; display: block; box-sizing: border-box;">🔍 Analisar Perfil Completo</a>
+
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <button onclick="avaliarPerfil(${prof.id}, 'aprovado')" style="flex: 1; background-color: #10b981; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold;">✔ Aprovar</button>
+                    <button onclick="avaliarPerfil(${prof.id}, 'rejeitado')" style="flex: 1; background-color: #ef4444; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold;">✖ Rejeitar</button>
+                </div>
+            `;
+            containerPendentes.appendChild(card);
+        });
+    } catch (erro) {
+        console.error("Erro ao carregar pendentes:", erro);
+    }
+}
+
+async function avaliarPerfil(perfilId, statusDecisao) {
+    if (!confirm(`Tem certeza que deseja ${statusDecisao} este perfil?`)) return;
+
+    try {
+        const resposta = await fetch(`${API_URL}/admin/avaliar/${perfilId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: statusDecisao })
+        });
+
+        if (resposta.ok) {
+            alert(`Perfil ${statusDecisao} com sucesso!`);
+            carregarPerfisPendentes();
+        } else {
+            alert('Falha ao atualizar o perfil.');
+        }
+    } catch (erro) {
+        alert('Erro ao conectar com o servidor.');
+    }
 }
