@@ -198,7 +198,7 @@ app.post('/api/esqueci-senha', async (req, res) => {
         const token = crypto.randomBytes(20).toString('hex');
         await pool.query('UPDATE usuarios SET token_recuperacao = $1 WHERE email = $2', [token, email]);
 
-        const linkRedefinicao = `http://127.0.0.1:5500/redefinir-senha.html?token=${token}`;
+        const linkRedefinicao = `https://skill-market-ruby.vercel.app/redefinir-senha.html?token=${token}`;
 
         const opcoesEmail = {
             from: process.env.EMAIL_USER,
