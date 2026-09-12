@@ -1,4 +1,4 @@
-const API_URL = 'https://skillmarket-api-7gpd.onrender.com';
+const API_URL = 'https://skillmarket-api-7gpd.onrender.com/api';
 
 // --- CONFIGURAÇÃO DE CABEÇALHO DINÂMICO ---
 function configurarHeaderDinamico() {
